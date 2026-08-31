@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>capimmm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="glow" id="glow"></div>
+
+  <main class="page">
+    <header class="profile" data-reveal>
+      <div class="avatar">
+        <span class="avatar-dot"></span>
+        <img src="avatar.png" alt="" onerror="this.style.display='none'">
+      </div>
+      <h1 class="name">capimmm</h1>
+      <p class="tagline">dev de interfaces, bots e coisas que brilham no escuro</p>
+    </header>
+
+    <section class="cards" id="cards" data-reveal></section>
+  </main>
+
+  <div class="overlay" id="overlay">
+    <div class="panel" id="panel">
+      <button class="panel-close" id="panelClose" aria-label="Fechar">✕</button>
+      <div class="panel-icon" id="panelIcon"></div>
+      <h2 class="panel-title" id="panelTitle"></h2>
+      <p class="panel-text" id="panelText">Carregando...</p>
+      <a class="panel-visit" id="panelVisit" href="#" rel="noopener">
+        <span id="panelVisitLabel">Visitar</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
