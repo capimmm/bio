@@ -3,7 +3,7 @@
 -------------------------------------------------------------------- */
 const CONFIG = {
   owner: "capimmm",
-  repo: "bio",   // <- troque pelo nome do repositório
+  repo: "SEU-REPOSITORIO",   // <- troque pelo nome do repositório
   branch: "main"
 };
 
@@ -332,10 +332,13 @@ async function setupMedia(){
   const bgVideo = document.getElementById("bgVideo");
   const bgAudio = document.getElementById("bgAudio");
   const hotbar = document.getElementById("hotbar");
+  const hotbarPulse = document.getElementById("hotbarPulse");
   const hotbarPlay = document.getElementById("hotbarPlay");
   const iconPlay = document.getElementById("hotbarIconPlay");
   const iconPause = document.getElementById("hotbarIconPause");
   const hotbarVideoToggle = document.getElementById("hotbarVideoToggle");
+  const videoIconOn = document.getElementById("hotbarVideoIconOn");
+  const videoIconOff = document.getElementById("hotbarVideoIconOff");
   const hotbarVolume = document.getElementById("hotbarVolume");
   const hotbarLabel = document.getElementById("hotbarLabel");
 
@@ -344,15 +347,33 @@ async function setupMedia(){
 
   if(!hasVideo && !hasAudio) return; // nada configurado, mantém tudo escondido
 
+  // cards ficam translúcidos enquanto o vídeo de fundo está rolando
+  function syncVideoBodyClass(){
+    document.body.classList.toggle("video-playing", hasVideo && !bgVideo.paused);
+  }
+
   if(hasVideo){
     bgVideo.src = "assets/background.mp4";
     bgVideo.muted = true;
-    bgVideo.play().catch(() => {});
+    bgVideo.play().then(syncVideoBodyClass).catch(() => {});
     bgWrap.hidden = false;
     hotbarVideoToggle.hidden = false;
+
+    bgVideo.addEventListener("play", syncVideoBodyClass);
+    bgVideo.addEventListener("pause", syncVideoBodyClass);
+
     hotbarVideoToggle.addEventListener("click", () => {
-      if(bgVideo.paused) bgVideo.play().catch(() => {});
-      else bgVideo.pause();
+      if(bgVideo.paused){
+        bgVideo.play().catch(() => {});
+        videoIconOn.hidden = false;
+        videoIconOff.hidden = true;
+        hotbarVideoToggle.setAttribute("aria-label", "Pausar vídeo de fundo");
+      }else{
+        bgVideo.pause();
+        videoIconOn.hidden = true;
+        videoIconOff.hidden = false;
+        hotbarVideoToggle.setAttribute("aria-label", "Retomar vídeo de fundo");
+      }
     });
   }
 
@@ -377,11 +398,13 @@ async function setupMedia(){
       else if(hasVideo) bgVideo.muted = false; // sem trilha separada, usa o som do próprio vídeo
       iconPlay.hidden = true;
       iconPause.hidden = false;
+      hotbar.classList.add("is-playing");
     }else{
       if(hasAudio) bgAudio.pause();
       if(hasVideo) bgVideo.muted = true;
       iconPlay.hidden = false;
       iconPause.hidden = true;
+      hotbar.classList.remove("is-playing");
     }
   });
 
