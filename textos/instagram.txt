@@ -1,0 +1,3 @@
+Instagram
+bastidores e prints do znyk
+Bastidores do que eu tô construindo, prints de interface, testes visuais e o processo por trás do znyk e dos outros projetos. Sem frescura, é basicamente um devlog.

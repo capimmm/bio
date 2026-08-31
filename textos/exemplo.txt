@@ -1,0 +1,3 @@
+Nome do card
+resumo curto que aparece na lista
+Texto completo que aparece quando o card é aberto. Pode ter mais de uma linha, escreva à vontade aqui.
