@@ -3,8 +3,9 @@
 -------------------------------------------------------------------- */
 const CONFIG = {
   owner: "capimmm",
-  repo: "capimmm/bio",   // <- troque pelo nome do repositório
-  branch: "main"
+  repo: "SEU-REPOSITORIO",   // <- troque pelo nome do repositório
+  branch: "main",
+  musicTitle: "música de fundo"   // <- texto que aparece na hotbar como "tocando agora"
 };
 
 /* ------------------------------------------------------------------
@@ -342,15 +343,11 @@ async function fileExists(path){
   }
 }
 
-function buildWaveform(el, bars = 46){
-  el.innerHTML = "";
-  for(let i = 0; i < bars; i++){
-    const bar = document.createElement("span");
-    const h = 25 + Math.round(Math.sin(i * 0.7) * 20 + Math.random() * 35);
-    bar.style.height = `${Math.max(15, Math.min(100, h))}%`;
-    bar.style.animationDelay = `${(i % 12) * -0.09}s`;
-    el.appendChild(bar);
-  }
+function formatTime(seconds){
+  if(!isFinite(seconds) || seconds < 0) return "0:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
 }
 
 async function setupMedia(){
@@ -358,15 +355,16 @@ async function setupMedia(){
   const bgVideo = document.getElementById("bgVideo");
   const bgAudio = document.getElementById("bgAudio");
   const hotbar = document.getElementById("hotbar");
-  const hotbarWave = document.getElementById("hotbarWave");
+  const hotbarTitle = document.getElementById("hotbarTitle");
   const hotbarSeek = document.getElementById("hotbarSeek");
+  const hotbarTimeCurrent = document.getElementById("hotbarTimeCurrent");
+  const hotbarTimeTotal = document.getElementById("hotbarTimeTotal");
   const hotbarPlay = document.getElementById("hotbarPlay");
   const iconPlay = document.getElementById("hotbarIconPlay");
   const iconPause = document.getElementById("hotbarIconPause");
-  const hotbarRepeat = document.getElementById("hotbarRepeat");
   const hotbarPrev = document.getElementById("hotbarPrev");
   const hotbarNext = document.getElementById("hotbarNext");
-  const hotbarShuffle = document.getElementById("hotbarShuffle");
+  const hotbarVolume = document.getElementById("hotbarVolume");
 
   const hasVideo = await fileExists("assets/background.mp4");
   const hasAudio = await fileExists("assets/music.mp3");
@@ -385,14 +383,16 @@ async function setupMedia(){
     bgAudio.src = "assets/music.mp3";
   }
 
-  buildWaveform(hotbarWave);
+  hotbarTitle.textContent = CONFIG.musicTitle || "música de fundo";
   hotbar.hidden = false;
 
   let seeking = false;
 
   function updateSeek(){
-    if(seeking || !master.duration) return;
-    hotbarSeek.value = (master.currentTime / master.duration) * 100;
+    if(!master.duration) return;
+    hotbarTimeCurrent.textContent = formatTime(master.currentTime);
+    hotbarTimeTotal.textContent = formatTime(master.duration);
+    if(!seeking) hotbarSeek.value = (master.currentTime / master.duration) * 100;
   }
 
   function setPlayingUI(isPlaying){
@@ -413,6 +413,7 @@ async function setupMedia(){
   }
 
   master.addEventListener("timeupdate", updateSeek);
+  master.addEventListener("loadedmetadata", updateSeek);
   master.addEventListener("play", () => setPlayingUI(true));
   master.addEventListener("pause", () => setPlayingUI(false));
 
@@ -439,15 +440,8 @@ async function setupMedia(){
     if(hasVideo) bgVideo.currentTime = Math.min(bgVideo.duration || 0, bgVideo.currentTime + 10);
   });
 
-  hotbarShuffle.addEventListener("click", () => {
-    if(hasAudio) bgAudio.currentTime = 0;
-    if(hasVideo) bgVideo.currentTime = 0;
-  });
-
-  hotbarRepeat.addEventListener("click", () => {
-    bgAudio.loop = !bgAudio.loop;
-    bgVideo.loop = !bgVideo.loop;
-    hotbarRepeat.setAttribute("aria-pressed", String(bgAudio.loop));
+  hotbarVolume.addEventListener("input", (e) => {
+    bgAudio.volume = parseFloat(e.target.value);
   });
 
   bgAudio.volume = 0.6;

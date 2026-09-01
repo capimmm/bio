@@ -21,7 +21,8 @@ Abra `script.js` e edite só isto, no topo do arquivo:
 const CONFIG = {
   owner: "capimmm",
   repo: "SEU-REPOSITORIO",   // <- nome do repositório no GitHub
-  branch: "main"
+  branch: "main",
+  musicTitle: "música de fundo"   // <- texto exibido na hotbar
 };
 ```
 
@@ -123,10 +124,11 @@ sozinho:
   escura por cima pra manter os cards legíveis)
 - `assets/music.mp3` -> música de fundo
 
-Quando pelo menos um dos dois existe, aparece uma **hotbar** flutuante no
-canto inferior esquerdo, no estilo de um tocador de música: waveform,
-barra de progresso arrastável e os controles repetir / voltar 10s /
-tocar-pausar / avançar 10s / reiniciar.
+Quando pelo menos um dos dois existe, aparece uma **hotbar** compacta no
+canto inferior esquerdo, no estilo "tocando agora": ícone + nome da
+faixa (defina em `CONFIG.musicTitle`), indicador de equalizer, botões de
+voltar 10s / tocar-pausar / avançar 10s, barra de progresso com os
+tempos, e um controle de volume fino embaixo.
 
 **Vídeo e música são sincronizados**: o botão de play/pause central toca
 ou pausa os dois ao mesmo tempo. O vídeo já entra tocando (mudo, é só
