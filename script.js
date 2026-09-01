@@ -3,7 +3,7 @@
 -------------------------------------------------------------------- */
 const CONFIG = {
   owner: "capimmm",
-  repo: "SEU-REPOSITORIO",   // <- troque pelo nome do repositório
+  repo: "bio",   // <- troque pelo nome do repositório
   branch: "main"
 };
 
