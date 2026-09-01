@@ -19,9 +19,6 @@
   <audio id="bgAudio" loop></audio>
 
   <div class="glow" id="glow"></div>
-  <div class="cursor-glitch" id="cursorGlitch">
-    <span></span><span></span><span></span>
-  </div>
 
   <main class="page">
     <header class="profile" data-reveal>
@@ -61,46 +58,64 @@
   </div>
 
   <!-- hotbar de mídia: só aparece se existir assets/background.mp4 e/ou assets/music.mp3
-       vídeo e música tocam e pausam sempre juntos -->
-  <div class="hotbar" id="hotbar" hidden>
-    <div class="hotbar-row hotbar-row--top">
-      <div class="hotbar-info">
-        <span class="hotbar-note">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M9 18V5l11-2v13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="16" r="2.6" stroke="currentColor" stroke-width="1.6"/></svg>
-        </span>
-        <span class="hotbar-text">
-          <span class="hotbar-eyebrow">tocando agora</span>
-          <span class="hotbar-title" id="hotbarTitle">música de fundo</span>
-        </span>
-      </div>
-
-      <div class="hotbar-actions">
-        <span class="hotbar-eq" id="hotbarEq"><span></span><span></span><span></span><span></span></span>
-
-        <button class="hotbar-icon-btn" id="hotbarPrev" aria-label="Voltar 10 segundos">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L9 12l9 6V6z" fill="currentColor"/><rect x="5.5" y="6" width="2" height="12" rx="1" fill="currentColor"/></svg>
-        </button>
-
-        <button class="hotbar-play" id="hotbarPlay" aria-label="Tocar ou pausar">
-          <svg id="hotbarIconPlay" viewBox="0 0 24 24" fill="none"><path d="M8 5.5v13l11-6.5-11-6.5z" fill="currentColor"/></svg>
-          <svg id="hotbarIconPause" viewBox="0 0 24 24" fill="none" hidden><rect x="6" y="5" width="4.2" height="14" rx="1.1" fill="currentColor"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.1" fill="currentColor"/></svg>
-        </button>
-
-        <button class="hotbar-icon-btn" id="hotbarNext" aria-label="Avançar 10 segundos">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l9 6-9 6V6z" fill="currentColor"/><rect x="16.5" y="6" width="2" height="12" rx="1" fill="currentColor"/></svg>
-        </button>
+       vídeo e música tocam e pausam sempre juntos. Depois de 5s sem uso ela
+       recolhe sozinha e mostra o QR code de apoio via Pix por cima. -->
+  <div class="hotbar-wrap" id="hotbarWrap">
+    <div class="hotbar-donate" id="hotbarDonate" hidden>
+      <img class="hotbar-donate-qr" src="assets/pix-qr.png" alt="QR code para pagamento via Pix">
+      <div class="hotbar-donate-text">
+        <span class="hotbar-donate-title">curtiu? apoia com um pix</span>
+        <span class="hotbar-donate-value">R$ 1,00</span>
       </div>
     </div>
 
-    <div class="hotbar-row hotbar-row--seek">
-      <span class="hotbar-time" id="hotbarTimeCurrent">0:00</span>
-      <input type="range" class="hotbar-seek" id="hotbarSeek" min="0" max="100" step="0.1" value="0">
-      <span class="hotbar-time" id="hotbarTimeTotal">0:00</span>
-    </div>
+    <div class="hotbar" id="hotbar" hidden>
+      <button class="hotbar-mini" id="hotbarMini" aria-label="Abrir controles de música">
+        <span class="hotbar-eq hotbar-eq--mini"><span></span><span></span><span></span><span></span></span>
+      </button>
 
-    <div class="hotbar-row hotbar-row--volume">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h3.5L12 19V5L7.5 9H4z" fill="currentColor"/><path d="M15.2 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      <input type="range" class="hotbar-volume-range" id="hotbarVolume" min="0" max="1" step="0.01" value="0.6">
+      <div class="hotbar-body" id="hotbarBody">
+        <div class="hotbar-row hotbar-row--top">
+          <div class="hotbar-info">
+            <span class="hotbar-note">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M9 18V5l11-2v13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="16" r="2.6" stroke="currentColor" stroke-width="1.6"/></svg>
+            </span>
+            <span class="hotbar-text">
+              <span class="hotbar-eyebrow">tocando agora</span>
+              <span class="hotbar-title" id="hotbarTitle">música de fundo</span>
+            </span>
+          </div>
+
+          <div class="hotbar-actions">
+            <span class="hotbar-eq" id="hotbarEq"><span></span><span></span><span></span><span></span></span>
+
+            <button class="hotbar-icon-btn" id="hotbarPrev" aria-label="Voltar 10 segundos">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L9 12l9 6V6z" fill="currentColor"/><rect x="5.5" y="6" width="2" height="12" rx="1" fill="currentColor"/></svg>
+            </button>
+
+            <button class="hotbar-play" id="hotbarPlay" aria-label="Tocar ou pausar">
+              <svg id="hotbarIconPlay" viewBox="0 0 24 24" fill="none"><path d="M8 5.5v13l11-6.5-11-6.5z" fill="currentColor"/></svg>
+              <svg id="hotbarIconPause" viewBox="0 0 24 24" fill="none" hidden><rect x="6" y="5" width="4.2" height="14" rx="1.1" fill="currentColor"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.1" fill="currentColor"/></svg>
+            </button>
+
+            <button class="hotbar-icon-btn" id="hotbarNext" aria-label="Avançar 10 segundos">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l9 6-9 6V6z" fill="currentColor"/><rect x="16.5" y="6" width="2" height="12" rx="1" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="hotbar-row hotbar-row--seek">
+          <span class="hotbar-time" id="hotbarTimeCurrent">0:00</span>
+          <input type="range" class="hotbar-seek" id="hotbarSeek" min="0" max="100" step="0.1" value="0">
+          <span class="hotbar-time" id="hotbarTimeTotal">0:00</span>
+        </div>
+
+        <div class="hotbar-row hotbar-row--volume">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h3.5L12 19V5L7.5 9H4z" fill="currentColor"/><path d="M15.2 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <input type="range" class="hotbar-volume-range" id="hotbarVolume" min="0" max="1" step="0.01" value="0.6">
+          <span class="hotbar-volume-tip" id="hotbarVolumeTip">60%</span>
+        </div>
+      </div>
     </div>
   </div>
 

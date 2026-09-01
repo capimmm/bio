@@ -313,17 +313,6 @@ attachTilt(avatarEl, {
 avatarEl.addEventListener("pointerenter", () => avatarEl.classList.add("avatar-hover"));
 avatarEl.addEventListener("pointerleave", () => avatarEl.classList.remove("avatar-hover"));
 
-/* ---------- cursor com glitch verde ---------- */
-const cursorGlitch = document.getElementById("cursorGlitch");
-if(cursorGlitch && window.matchMedia("(pointer: fine)").matches){
-  window.addEventListener("pointermove", (e) => {
-    cursorGlitch.style.left = e.clientX + "px";
-    cursorGlitch.style.top = e.clientY + "px";
-    cursorGlitch.classList.add("is-active");
-  }, { passive: true });
-  document.addEventListener("pointerleave", () => cursorGlitch.classList.remove("is-active"));
-}
-
 /* ------------------------------------------------------------------
    fundo em vídeo + hotbar de mídia
    Coloque (opcional):
@@ -354,7 +343,10 @@ async function setupMedia(){
   const bgWrap = document.getElementById("bgVideoWrap");
   const bgVideo = document.getElementById("bgVideo");
   const bgAudio = document.getElementById("bgAudio");
+  const hotbarWrap = document.getElementById("hotbarWrap");
   const hotbar = document.getElementById("hotbar");
+  const hotbarMini = document.getElementById("hotbarMini");
+  const hotbarDonate = document.getElementById("hotbarDonate");
   const hotbarTitle = document.getElementById("hotbarTitle");
   const hotbarSeek = document.getElementById("hotbarSeek");
   const hotbarTimeCurrent = document.getElementById("hotbarTimeCurrent");
@@ -365,6 +357,8 @@ async function setupMedia(){
   const hotbarPrev = document.getElementById("hotbarPrev");
   const hotbarNext = document.getElementById("hotbarNext");
   const hotbarVolume = document.getElementById("hotbarVolume");
+  const hotbarVolumeTip = document.getElementById("hotbarVolumeTip");
+  const hotbarVolumeRow = hotbarVolume.closest(".hotbar-row--volume");
 
   const hasVideo = await fileExists("assets/background.mp4");
   const hasAudio = await fileExists("assets/music.mp3");
@@ -440,12 +434,38 @@ async function setupMedia(){
     if(hasVideo) bgVideo.currentTime = Math.min(bgVideo.duration || 0, bgVideo.currentTime + 10);
   });
 
+  // tooltip com a porcentagem enquanto mexe no volume
+  let volumeTipTimer = null;
   hotbarVolume.addEventListener("input", (e) => {
-    bgAudio.volume = parseFloat(e.target.value);
+    const v = parseFloat(e.target.value);
+    bgAudio.volume = v;
+    hotbarVolumeTip.textContent = Math.round(v * 100) + "%";
+    hotbarVolumeRow.classList.add("is-active");
+    clearTimeout(volumeTipTimer);
+    volumeTipTimer = setTimeout(() => hotbarVolumeRow.classList.remove("is-active"), 900);
   });
 
   bgAudio.volume = 0.6;
   bgVideo.volume = 0;
+
+  // ---- recolhe sozinha após 5s sem uso e mostra o QR code de apoio ----
+  let idleTimer = null;
+  function expandHotbar(){
+    clearTimeout(idleTimer);
+    hotbar.classList.remove("is-collapsed");
+    hotbarDonate.hidden = true;
+    idleTimer = setTimeout(collapseHotbar, 5000);
+  }
+  function collapseHotbar(){
+    hotbar.classList.add("is-collapsed");
+    hotbarDonate.hidden = false;
+  }
+
+  hotbarWrap.addEventListener("pointerenter", expandHotbar);
+  hotbarWrap.addEventListener("pointerdown", expandHotbar);
+  hotbarMini.addEventListener("click", expandHotbar);
+
+  expandHotbar(); // começa aberta e já dispara o primeiro contador de 5s
 
   // tenta já começar tocando os dois juntos assim que entra no site.
   // navegadores bloqueiam áudio com som sem interação do usuário — nesse

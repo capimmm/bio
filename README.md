@@ -145,6 +145,24 @@ vídeo aparecer por trás.
 Se nenhum dos dois arquivos existir, a hotbar fica escondida e o site usa
 o fundo padrão em gradiente, sem quebrar nada.
 
+## hotbar recolhe sozinha + QR code de apoio (Pix)
+
+Se a pessoa passar 5 segundos sem interagir com a hotbar (sem clicar,
+arrastar ou passar o mouse por cima), ela recolhe automaticamente pra um
+botãozinho redondo mostrando só o equalizer se mexendo, e acima dele
+aparece um cartão com QR code convidando pra um apoio via Pix.
+
+O QR code (`assets/pix-qr.png`) já foi gerado a partir do seu link de
+cobrança do Nubank e testado — ele decodifica exatamente para:
+`https://nubank.com.br/cobrar/7c4vss/6a963c13-e747-413e-b583-7ae4cdad4886`
+
+Se quiser trocar o link (ex: gerar um novo cobrança no app do Nubank),
+é só gerar um novo QR code (qualquer gerador confiável) e substituir o
+arquivo `assets/pix-qr.png`, mantendo o mesmo nome.
+
+Clicar no botãozinho recolhido (ou passar o mouse/mexer em qualquer
+controle) expande a hotbar de novo e reinicia o contador de 5 segundos.
+
 ## trocar a foto de perfil
 
 Coloque uma imagem chamada `avatar.png` na raiz do projeto. Se não

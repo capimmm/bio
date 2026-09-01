@@ -69,67 +69,6 @@ body::before{
   filter: blur(10px);
 }
 
-/* ---------- cursor com glitch verde (telas com mouse) ---------- */
-
-.cursor-glitch{
-  position:fixed;
-  left:0; top:0;
-  width:16px; height:16px;
-  pointer-events:none;
-  z-index:9999;
-  transform: translate(-50%,-50%);
-  mix-blend-mode: screen;
-  opacity:0;
-  transition: opacity .2s ease;
-}
-.cursor-glitch.is-active{ opacity:1; }
-
-.cursor-glitch span{
-  position:absolute;
-  inset:0;
-  border:1.4px solid var(--lime);
-  border-radius:3px;
-}
-.cursor-glitch span:nth-child(1){
-  animation: glitchA 2.6s steps(10) infinite;
-}
-.cursor-glitch span:nth-child(2){
-  border-color:#5cff9d;
-  opacity:.7;
-  animation: glitchB 3.1s steps(8) infinite;
-}
-.cursor-glitch span:nth-child(3){
-  border-color:#1f7a34;
-  opacity:.6;
-  animation: glitchC 2.2s steps(7) infinite reverse;
-}
-
-@keyframes glitchA{
-  0%,100%{ transform:translate(0,0); }
-  8%{ transform:translate(2px,-1px); }
-  16%{ transform:translate(-2px,1px); }
-  24%{ transform:translate(0,0); }
-  55%{ transform:translate(1px,2px); }
-  70%{ transform:translate(-1px,-1px); }
-}
-@keyframes glitchB{
-  0%,100%{ transform:translate(0,0) scale(1); }
-  12%{ transform:translate(-3px,1px) scale(1.08); }
-  30%{ transform:translate(0,0) scale(1); }
-  63%{ transform:translate(2px,-2px) scale(.95); }
-  80%{ transform:translate(0,0) scale(1); }
-}
-@keyframes glitchC{
-  0%,100%{ transform:translate(0,0); }
-  20%{ transform:translate(2px,2px); }
-  45%{ transform:translate(-2px,0); }
-  75%{ transform:translate(1px,-2px); }
-}
-
-@media (pointer: coarse){
-  .cursor-glitch{ display:none; }
-}
-
 .page{
   position:relative;
   z-index:1;
@@ -309,7 +248,9 @@ body.video-playing .panel{
   backdrop-filter: blur(22px) saturate(1.1);
   -webkit-backdrop-filter: blur(22px) saturate(1.1);
 }
-body.video-playing .hotbar{
+body.video-playing .hotbar-body,
+body.video-playing .hotbar-mini,
+body.video-playing .hotbar-donate{
   background: rgba(6,8,5,0.55);
 }
 
@@ -512,11 +453,86 @@ body.video-playing .hotbar{
 
 /* ---------- hotbar de mídia (compacta, estilo "now playing") ---------- */
 
-.hotbar{
+.hotbar-wrap{
   position:fixed;
   left:18px;
   bottom:18px;
   z-index:20;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:10px;
+}
+
+/* card de doação (Pix) que aparece acima da hotbar quando ela recolhe */
+.hotbar-donate{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  background: rgba(8,9,7,0.85);
+  border:1px solid rgba(166,226,46,0.3);
+  border-radius:14px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 14px 34px -14px rgba(0,0,0,0.65), 0 0 24px -6px rgba(166,226,46,0.25);
+  animation: reveal .35s cubic-bezier(.22,1,.36,1) forwards;
+}
+.hotbar-donate-qr{
+  width:64px; height:64px;
+  border-radius:8px;
+  background:#fff;
+  padding:4px;
+  flex:none;
+}
+.hotbar-donate-text{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  max-width:140px;
+}
+.hotbar-donate-title{
+  font-size:12px;
+  color: var(--text);
+  line-height:1.35;
+}
+.hotbar-donate-value{
+  font-family: var(--font-display);
+  font-size:15px;
+  font-weight:600;
+  color: var(--lime);
+}
+
+.hotbar{
+  display:flex;
+  align-items:center;
+  z-index:20;
+  transition: border-color .3s ease, box-shadow .3s ease, background .3s ease;
+  animation: reveal .5s cubic-bezier(.22,1,.36,1) forwards;
+}
+
+.hotbar.is-playing{
+  border-color: rgba(166,226,46,0.28);
+  box-shadow: 0 14px 38px -14px rgba(166,226,46,0.2);
+}
+
+/* botão mini: só visível quando a hotbar está recolhida */
+.hotbar-mini{
+  display:none;
+  width:44px; height:44px;
+  border-radius:50%;
+  border:1px solid var(--surface-border);
+  background: rgba(8,9,7,0.78);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 14px 34px -14px rgba(0,0,0,0.65);
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.hotbar-mini .hotbar-eq--mini{ width:16px; height:14px; }
+
+.hotbar-body{
   display:flex;
   flex-direction:column;
   gap:7px;
@@ -528,13 +544,17 @@ body.video-playing .hotbar{
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   box-shadow: 0 14px 34px -14px rgba(0,0,0,0.65);
-  transition: border-color .3s ease, box-shadow .3s ease, background .3s ease;
-  animation: reveal .5s cubic-bezier(.22,1,.36,1) forwards;
+  transition: border-color .3s ease, box-shadow .3s ease;
 }
+.hotbar.is-playing .hotbar-body{ border-color: rgba(166,226,46,0.28); }
 
-.hotbar.is-playing{
-  border-color: rgba(166,226,46,0.28);
-  box-shadow: 0 14px 38px -14px rgba(166,226,46,0.2);
+/* estado recolhido: some o corpo, mostra só o botão mini pulsando */
+.hotbar.is-collapsed .hotbar-body{
+  display:none;
+}
+.hotbar.is-collapsed .hotbar-mini{
+  display:flex;
+  animation: reveal .35s cubic-bezier(.22,1,.36,1) forwards;
 }
 
 .hotbar-row{ display:flex; align-items:center; }
@@ -724,9 +744,27 @@ body.video-playing .hotbar{
 .hotbar-volume-range::-webkit-slider-runnable-track{ background:transparent; }
 .hotbar-volume-range::-moz-range-track{ background:transparent; }
 
+.hotbar-volume-tip{
+  font-size:10px;
+  font-weight:600;
+  color: var(--lime);
+  flex:none;
+  min-width:30px;
+  text-align:right;
+  opacity:0;
+  transform: translateY(2px);
+  transition: opacity .18s ease, transform .18s ease;
+}
+.hotbar-row--volume.is-active .hotbar-volume-tip{
+  opacity:1;
+  transform: translateY(0);
+}
+
 @media (max-width:420px){
-  .hotbar{ left:12px; bottom:12px; width:236px; padding:10px 12px; }
+  .hotbar-wrap{ left:12px; bottom:12px; }
+  .hotbar-body{ width:236px; padding:10px 12px; }
   .hotbar-title{ max-width:90px; }
+  .hotbar-donate-text{ max-width:110px; }
 }
 
 /* ---------- entrada orquestrada ---------- */
