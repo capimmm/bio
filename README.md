@@ -103,6 +103,17 @@ soltar. Isso é automático, não precisa configurar nada — só funciona
 melhor em telas com mouse; no celular o tilt fica desativado e os cards
 continuam com o hover normal.
 
+Passar o mouse por cima da foto de perfil também faz ela crescer, ficar
+mais "quadrada" (de círculo pra squircle) e ganhar uma borda brilhante —
+tudo automático, sem configuração.
+
+## cursor com glitch verde
+
+Em telas com mouse, aparece um pequeno efeito de glitch verde seguindo o
+cursor (três quadrados verdes que se deslocam de forma irregular). É só
+decorativo, não substitui o cursor do sistema, e some sozinho em telas de
+toque (celular/tablet).
+
 ## fundo em vídeo e música (opcional)
 
 Se você colocar os arquivos abaixo na pasta `assets/`, o site ativa
@@ -113,15 +124,21 @@ sozinho:
 - `assets/music.mp3` -> música de fundo
 
 Quando pelo menos um dos dois existe, aparece uma **hotbar** flutuante no
-canto inferior esquerdo com:
-- botão de tocar/pausar a música (ou o som do vídeo, se não houver música
-  separada)
-- um botão extra pra pausar só o vídeo, mantendo a música tocando
-- controle de volume
+canto inferior esquerdo, no estilo de um tocador de música: waveform,
+barra de progresso arrastável e os controles repetir / voltar 10s /
+tocar-pausar / avançar 10s / reiniciar.
 
-Os navegadores bloqueiam som automático, então o vídeo sempre começa mudo
-como decoração e o som só liga quando a pessoa aperta o play na hotbar —
-isso é comportamento do navegador, não dá pra pular essa etapa.
+**Vídeo e música são sincronizados**: o botão de play/pause central toca
+ou pausa os dois ao mesmo tempo. O vídeo já entra tocando (mudo, é só
+decoração) e o site tenta tocar a música automaticamente assim que a
+página carrega; se o navegador bloquear esse autoplay com som (a maioria
+bloqueia por padrão), a música entra sozinha assim que a pessoa interagir
+pela primeira vez com a página — um clique ou toque em qualquer lugar já
+resolve, sem precisar apertar o play manualmente. Isso é uma regra dos
+próprios navegadores, não dá pra pular essa etapa.
+
+Enquanto o vídeo está rolando, os cards ficam translúcidos pra deixar o
+vídeo aparecer por trás.
 
 Se nenhum dos dois arquivos existir, a hotbar fica escondida e o site usa
 o fundo padrão em gradiente, sem quebrar nada.

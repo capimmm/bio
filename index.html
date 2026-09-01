@@ -19,6 +19,9 @@
   <audio id="bgAudio" loop></audio>
 
   <div class="glow" id="glow"></div>
+  <div class="cursor-glitch" id="cursorGlitch">
+    <span></span><span></span><span></span>
+  </div>
 
   <main class="page">
     <header class="profile" data-reveal>
@@ -57,22 +60,35 @@
     </div>
   </div>
 
-  <!-- hotbar de mídia: só aparece se existir assets/background.mp4 e/ou assets/music.mp3 -->
+  <!-- hotbar de mídia: só aparece se existir assets/background.mp4 e/ou assets/music.mp3
+       vídeo e música tocam e pausam sempre juntos -->
   <div class="hotbar" id="hotbar" hidden>
-    <span class="hotbar-pulse" id="hotbarPulse"></span>
-    <button class="hotbar-btn" id="hotbarPlay" aria-label="Tocar ou pausar">
-      <svg id="hotbarIconPlay" viewBox="0 0 24 24" fill="none"><path d="M6 4.5v15l13-7.5-13-7.5z" fill="currentColor"/></svg>
-      <svg id="hotbarIconPause" viewBox="0 0 24 24" fill="none" hidden><rect x="5" y="4" width="5" height="16" rx="1.2" fill="currentColor"/><rect x="14" y="4" width="5" height="16" rx="1.2" fill="currentColor"/></svg>
-    </button>
-    <button class="hotbar-btn hotbar-btn--ghost" id="hotbarVideoToggle" aria-label="Pausar vídeo de fundo" hidden>
-      <svg id="hotbarVideoIconOn" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="13" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 9v5l4-2.5-4-2.5z" fill="currentColor"/></svg>
-      <svg id="hotbarVideoIconOff" viewBox="0 0 24 24" fill="none" hidden><rect x="3" y="5" width="18" height="13" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 8.5v7l3.5-2.3M13.5 9v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-    </button>
-    <div class="hotbar-volume">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h3.5L12 19V5L7.5 9H4z" fill="currentColor"/><path d="M15.2 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      <input type="range" id="hotbarVolume" min="0" max="1" step="0.01" value="0.6">
+    <div class="hotbar-wave" id="hotbarWave"></div>
+
+    <input type="range" class="hotbar-seek" id="hotbarSeek" min="0" max="100" step="0.1" value="0">
+
+    <div class="hotbar-controls">
+      <button class="hotbar-icon-btn" id="hotbarRepeat" aria-label="Repetir" aria-pressed="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6 3v3a2 2 0 0 0 2 2h9M18 21v-3a2 2 0 0 0-2-2H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 6L4 4m2 2L4 8M18 18l2 2m-2-2l2-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <button class="hotbar-icon-btn" id="hotbarPrev" aria-label="Voltar 10 segundos">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5L5 12l7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 5l-7 7 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <button class="hotbar-play" id="hotbarPlay" aria-label="Tocar ou pausar">
+        <svg id="hotbarIconPlay" viewBox="0 0 24 24" fill="none"><path d="M8 5.5v13l11-6.5-11-6.5z" fill="currentColor"/></svg>
+        <svg id="hotbarIconPause" viewBox="0 0 24 24" fill="none" hidden><rect x="6" y="5" width="4.5" height="14" rx="1.2" fill="currentColor"/><rect x="13.5" y="5" width="4.5" height="14" rx="1.2" fill="currentColor"/></svg>
+      </button>
+
+      <button class="hotbar-icon-btn" id="hotbarNext" aria-label="Avançar 10 segundos">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <button class="hotbar-icon-btn" id="hotbarShuffle" aria-label="Reiniciar do começo">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 6h3.5L14 17h3.5M3 17h3.5L11 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 6h2.5M17.5 6l-2 -2m2 2l-2 2M15 17h2.5M17.5 17l-2-2m2 2l-2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div>
-    <span class="hotbar-label" id="hotbarLabel">música</span>
   </div>
 
   <script src="script.js"></script>

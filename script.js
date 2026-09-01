@@ -302,12 +302,26 @@ window.addEventListener("pointermove", (e) => {
   glow.style.top = e.clientY + "px";
 });
 
-/* tilt 3D do avatar */
-attachTilt(document.getElementById("avatar"), {
-  max: 12,
-  scale: 1.03,
+/* tilt 3D do avatar + efeito "fica maior e quadrado" no hover */
+const avatarEl = document.getElementById("avatar");
+attachTilt(avatarEl, {
+  max: 14,
+  scale: 1.16,
   shine: document.querySelector(".avatar-shine")
 });
+avatarEl.addEventListener("pointerenter", () => avatarEl.classList.add("avatar-hover"));
+avatarEl.addEventListener("pointerleave", () => avatarEl.classList.remove("avatar-hover"));
+
+/* ---------- cursor com glitch verde ---------- */
+const cursorGlitch = document.getElementById("cursorGlitch");
+if(cursorGlitch && window.matchMedia("(pointer: fine)").matches){
+  window.addEventListener("pointermove", (e) => {
+    cursorGlitch.style.left = e.clientX + "px";
+    cursorGlitch.style.top = e.clientY + "px";
+    cursorGlitch.classList.add("is-active");
+  }, { passive: true });
+  document.addEventListener("pointerleave", () => cursorGlitch.classList.remove("is-active"));
+}
 
 /* ------------------------------------------------------------------
    fundo em vídeo + hotbar de mídia
@@ -315,7 +329,8 @@ attachTilt(document.getElementById("avatar"), {
      assets/background.mp4  -> vídeo de fundo
      assets/music.mp3       -> música de fundo
    Se nenhum dos dois existir, a hotbar fica escondida e o fundo
-   continua sendo o gradiente padrão.
+   continua sendo o gradiente padrão. Se os dois existirem, tocam e
+   pausam sempre juntos (sincronizados).
 -------------------------------------------------------------------- */
 
 async function fileExists(path){
@@ -327,92 +342,134 @@ async function fileExists(path){
   }
 }
 
+function buildWaveform(el, bars = 46){
+  el.innerHTML = "";
+  for(let i = 0; i < bars; i++){
+    const bar = document.createElement("span");
+    const h = 25 + Math.round(Math.sin(i * 0.7) * 20 + Math.random() * 35);
+    bar.style.height = `${Math.max(15, Math.min(100, h))}%`;
+    bar.style.animationDelay = `${(i % 12) * -0.09}s`;
+    el.appendChild(bar);
+  }
+}
+
 async function setupMedia(){
   const bgWrap = document.getElementById("bgVideoWrap");
   const bgVideo = document.getElementById("bgVideo");
   const bgAudio = document.getElementById("bgAudio");
   const hotbar = document.getElementById("hotbar");
-  const hotbarPulse = document.getElementById("hotbarPulse");
+  const hotbarWave = document.getElementById("hotbarWave");
+  const hotbarSeek = document.getElementById("hotbarSeek");
   const hotbarPlay = document.getElementById("hotbarPlay");
   const iconPlay = document.getElementById("hotbarIconPlay");
   const iconPause = document.getElementById("hotbarIconPause");
-  const hotbarVideoToggle = document.getElementById("hotbarVideoToggle");
-  const videoIconOn = document.getElementById("hotbarVideoIconOn");
-  const videoIconOff = document.getElementById("hotbarVideoIconOff");
-  const hotbarVolume = document.getElementById("hotbarVolume");
-  const hotbarLabel = document.getElementById("hotbarLabel");
+  const hotbarRepeat = document.getElementById("hotbarRepeat");
+  const hotbarPrev = document.getElementById("hotbarPrev");
+  const hotbarNext = document.getElementById("hotbarNext");
+  const hotbarShuffle = document.getElementById("hotbarShuffle");
 
   const hasVideo = await fileExists("assets/background.mp4");
   const hasAudio = await fileExists("assets/music.mp3");
 
   if(!hasVideo && !hasAudio) return; // nada configurado, mantém tudo escondido
 
-  // cards ficam translúcidos enquanto o vídeo de fundo está rolando
-  function syncVideoBodyClass(){
-    document.body.classList.toggle("video-playing", hasVideo && !bgVideo.paused);
-  }
+  // referência principal do "tempo" da hotbar: música se existir, senão o vídeo
+  const master = hasAudio ? bgAudio : bgVideo;
 
   if(hasVideo){
     bgVideo.src = "assets/background.mp4";
-    bgVideo.muted = true;
-    bgVideo.play().then(syncVideoBodyClass).catch(() => {});
+    bgVideo.muted = true; // o som sempre vem da música/áudio, o vídeo é só visual
     bgWrap.hidden = false;
-    hotbarVideoToggle.hidden = false;
-
-    bgVideo.addEventListener("play", syncVideoBodyClass);
-    bgVideo.addEventListener("pause", syncVideoBodyClass);
-
-    hotbarVideoToggle.addEventListener("click", () => {
-      if(bgVideo.paused){
-        bgVideo.play().catch(() => {});
-        videoIconOn.hidden = false;
-        videoIconOff.hidden = true;
-        hotbarVideoToggle.setAttribute("aria-label", "Pausar vídeo de fundo");
-      }else{
-        bgVideo.pause();
-        videoIconOn.hidden = true;
-        videoIconOff.hidden = false;
-        hotbarVideoToggle.setAttribute("aria-label", "Retomar vídeo de fundo");
-      }
-    });
   }
-
   if(hasAudio){
     bgAudio.src = "assets/music.mp3";
-    hotbarLabel.textContent = "música";
-  }else{
-    hotbarLabel.textContent = "vídeo";
   }
 
+  buildWaveform(hotbarWave);
   hotbar.hidden = false;
-  hotbarVolume.value = "0.6";
-  bgAudio.volume = 0.6;
-  bgVideo.volume = 0.6;
 
-  let playing = false;
+  let seeking = false;
+
+  function updateSeek(){
+    if(seeking || !master.duration) return;
+    hotbarSeek.value = (master.currentTime / master.duration) * 100;
+  }
+
+  function setPlayingUI(isPlaying){
+    iconPlay.hidden = isPlaying;
+    iconPause.hidden = !isPlaying;
+    hotbar.classList.toggle("is-playing", isPlaying);
+    document.body.classList.toggle("video-playing", hasVideo && isPlaying);
+  }
+
+  // vídeo e música tocam/pausam sempre juntos
+  function playBoth(){
+    if(hasAudio) bgAudio.play().catch(() => {});
+    if(hasVideo) bgVideo.play().catch(() => {});
+  }
+  function pauseBoth(){
+    if(hasAudio) bgAudio.pause();
+    if(hasVideo) bgVideo.pause();
+  }
+
+  master.addEventListener("timeupdate", updateSeek);
+  master.addEventListener("play", () => setPlayingUI(true));
+  master.addEventListener("pause", () => setPlayingUI(false));
 
   hotbarPlay.addEventListener("click", () => {
-    playing = !playing;
-    if(playing){
-      if(hasAudio) bgAudio.play().catch(() => {});
-      else if(hasVideo) bgVideo.muted = false; // sem trilha separada, usa o som do próprio vídeo
-      iconPlay.hidden = true;
-      iconPause.hidden = false;
-      hotbar.classList.add("is-playing");
-    }else{
-      if(hasAudio) bgAudio.pause();
-      if(hasVideo) bgVideo.muted = true;
-      iconPlay.hidden = false;
-      iconPause.hidden = true;
-      hotbar.classList.remove("is-playing");
-    }
+    if(master.paused) playBoth();
+    else pauseBoth();
   });
 
-  hotbarVolume.addEventListener("input", (e) => {
-    const v = parseFloat(e.target.value);
-    bgAudio.volume = v;
-    bgVideo.volume = v;
+  hotbarSeek.addEventListener("input", () => { seeking = true; });
+  hotbarSeek.addEventListener("change", () => {
+    const ratio = hotbarSeek.value / 100;
+    if(hasAudio && bgAudio.duration) bgAudio.currentTime = ratio * bgAudio.duration;
+    if(hasVideo && bgVideo.duration) bgVideo.currentTime = ratio * bgVideo.duration;
+    seeking = false;
   });
+
+  hotbarPrev.addEventListener("click", () => {
+    if(hasAudio) bgAudio.currentTime = Math.max(0, bgAudio.currentTime - 10);
+    if(hasVideo) bgVideo.currentTime = Math.max(0, bgVideo.currentTime - 10);
+  });
+
+  hotbarNext.addEventListener("click", () => {
+    if(hasAudio) bgAudio.currentTime = Math.min(bgAudio.duration || 0, bgAudio.currentTime + 10);
+    if(hasVideo) bgVideo.currentTime = Math.min(bgVideo.duration || 0, bgVideo.currentTime + 10);
+  });
+
+  hotbarShuffle.addEventListener("click", () => {
+    if(hasAudio) bgAudio.currentTime = 0;
+    if(hasVideo) bgVideo.currentTime = 0;
+  });
+
+  hotbarRepeat.addEventListener("click", () => {
+    bgAudio.loop = !bgAudio.loop;
+    bgVideo.loop = !bgVideo.loop;
+    hotbarRepeat.setAttribute("aria-pressed", String(bgAudio.loop));
+  });
+
+  bgAudio.volume = 0.6;
+  bgVideo.volume = 0;
+
+  // tenta já começar tocando os dois juntos assim que entra no site.
+  // navegadores bloqueiam áudio com som sem interação do usuário — nesse
+  // caso o vídeo já começa (mudo) e a música entra automaticamente assim
+  // que a pessoa interagir pela primeira vez com a página.
+  playBoth();
+
+  const tryUnlock = () => {
+    if(hasAudio && bgAudio.paused){
+      bgAudio.play().catch(() => {});
+    }
+    document.removeEventListener("pointerdown", tryUnlock);
+    document.removeEventListener("keydown", tryUnlock);
+    document.removeEventListener("touchstart", tryUnlock);
+  };
+  document.addEventListener("pointerdown", tryUnlock, { once: true });
+  document.addEventListener("keydown", tryUnlock, { once: true });
+  document.addEventListener("touchstart", tryUnlock, { once: true });
 }
 
 buildCards();
