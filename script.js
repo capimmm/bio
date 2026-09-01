@@ -3,9 +3,9 @@
 -------------------------------------------------------------------- */
 const CONFIG = {
   owner: "capimmm",
-  repo: "SEU-REPOSITORIO",   // <- troque pelo nome do repositório
+  repo: "capimmm/bio",   // <- troque pelo nome do repositório
   branch: "main",
-  musicTitle: "música de fundo"   // <- texto que aparece na hotbar como "tocando agora"
+  musicTitle: "edit by..."   // <- texto que aparece na hotbar como "tocando agora"
 };
 
 /* ------------------------------------------------------------------
