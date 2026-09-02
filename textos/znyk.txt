@@ -1,5 +1,0 @@
-titulo: znyk
-resumo: convida o bot pro seu server
-cor: #9b6bff
----
-znyk é o bot de Discord que eu desenvolvo. Clique em visitar pra convidar ele pro seu server.
